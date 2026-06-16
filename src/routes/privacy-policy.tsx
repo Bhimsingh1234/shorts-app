@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { GradientPanel, LegalCards, SectionHeading } from "@/components/stackearn-site";
+import { LegalPageContent, PageHero, legalHeroPills } from "@/components/stackearn-site";
 import { privacySections } from "@/lib/stackearn-content";
 
 export const Route = createFileRoute("/privacy-policy")({
@@ -15,8 +15,7 @@ export const Route = createFileRoute("/privacy-policy")({
       { property: "og:title", content: "Privacy Policy — StackEarn Shorts Downloader" },
       {
         property: "og:description",
-        content:
-          "Understand how StackEarn presents privacy, analytics, cookies, and security information.",
+        content: "Understand how StackEarn presents privacy, analytics, cookies, and security information.",
       },
       { property: "og:url", content: "/privacy-policy" },
     ],
@@ -27,21 +26,26 @@ export const Route = createFileRoute("/privacy-policy")({
 
 function PrivacyPolicyPage() {
   return (
-    <div className="page-shell">
-      <section className="hero-section hero-section-tight">
-        <div className="hero-copy max-w-3xl">
-          <SectionHeading
-            eyebrow="Privacy Policy"
-            title={<>Clear privacy guidance for StackEarn users</>}
-            description="This page outlines how StackEarn presents information collection, analytics usage, advertising services, cookies, third-party services, user rights, data security, and contact details."
-          />
-        </div>
-      </section>
+    <div className="page-shell reveal-fade">
+      <PageHero
+        breadcrumbs={[{ label: "Home", to: "/" }, { label: "Privacy Policy" }]}
+        eyebrow="Privacy Policy"
+        title={
+          <>
+            Privacy <span className="text-primary">Policy</span>
+          </>
+        }
+        description="Your privacy is important to us. This Privacy Policy explains how StackEarn Shorts Downloader collects, uses and protects your information."
+        pills={legalHeroPills}
+        variant="privacy"
+      />
 
-      <section className="section-gap">
-        <GradientPanel className="p-6 lg:p-8">
-          <LegalCards sections={privacySections} />
-        </GradientPanel>
+      <section className="section-gap reveal-up">
+        <LegalPageContent
+          sections={privacySections}
+          supportTitle="Questions About Privacy?"
+          supportText="If you have any questions about this Privacy Policy, feel free to contact us."
+        />
       </section>
     </div>
   );

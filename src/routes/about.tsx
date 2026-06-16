@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Globe, Rocket, Target } from "lucide-react";
 
-import { AppsGrid, GradientPanel, SectionHeading } from "@/components/stackearn-site";
+import { AppsGrid, GradientPanel, PageHero, SectionHeading } from "@/components/stackearn-site";
 import { site } from "@/lib/stackearn-content";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: `About StackEarn — Android Apps & Digital Tools` },
+      { title: "About StackEarn — Android Apps & Digital Tools" },
       {
         name: "description",
         content:
@@ -29,52 +29,37 @@ export const Route = createFileRoute("/about")({
 function AboutPage() {
   const pillars = [
     {
-      title: "Mission",
-      description: "Provide fast, reliable and user-friendly digital solutions.",
+      title: "Our Story",
+      description: "StackEarn started with a simple vision: practical apps and digital tools that solve everyday problems with speed and simplicity.",
       icon: Target,
     },
     {
-      title: "Vision",
-      description: "Build a global ecosystem of trusted apps and online tools.",
-      icon: Globe,
+      title: "Our Mission",
+      description: "Build user-friendly applications that help people access, manage and enjoy digital content more efficiently.",
+      icon: Rocket,
     },
     {
-      title: "Momentum",
-      description: "Keep launching practical products that simplify everyday mobile workflows.",
-      icon: Rocket,
+      title: "Our Vision",
+      description: "Grow into a trusted ecosystem of digital products that are useful, reliable and accessible worldwide.",
+      icon: Globe,
     },
   ];
 
   return (
-    <div className="page-shell">
-      <section className="hero-section">
-        <div className="hero-copy">
-          <SectionHeading
-            eyebrow="About StackEarn"
-            title={<>Building smart apps & digital tools for everyone</>}
-            description={site.description}
-          />
-          <p className="max-w-2xl text-base leading-8 text-muted-foreground">
-            StackEarn develops innovative Android applications and digital tools designed to improve productivity and simplify everyday tasks.
-          </p>
-        </div>
-        <div className="hero-device hero-device-about">
-          <div className="device-glow" />
-          <div className="device-frame">
-            <div className="device-screen">
-              <div className="screen-title">StackEarn Apps</div>
-              <div className="screen-grid">
-                <div className="screen-card coral" />
-                <div className="screen-card violet" />
-                <div className="screen-card mint" />
-                <div className="screen-card pink" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+    <div className="page-shell reveal-fade">
+      <PageHero
+        breadcrumbs={[{ label: "Home", to: "/" }, { label: "About Us" }]}
+        eyebrow="About Us"
+        title={
+          <>
+            About <span className="text-primary">StackEarn</span>
+          </>
+        }
+        description={site.description}
+        variant="about"
+      />
 
-      <section className="section-gap">
+      <section className="section-gap reveal-up">
         <div className="grid gap-6 lg:grid-cols-3">
           {pillars.map((pillar) => {
             const Icon = pillar.icon;
@@ -91,11 +76,15 @@ function AboutPage() {
         </div>
       </section>
 
-      <section className="section-gap">
+      <section className="section-gap reveal-up delay-1">
         <SectionHeading
-          eyebrow="What we build"
-          title={<>The StackEarn ecosystem</>}
-          description="From all-in-one video utilities to focused download tools, StackEarn organizes products around speed, simplicity, and Android-first usability."
+          eyebrow="What We Build"
+          title={
+            <>
+              The <span className="text-primary">StackEarn</span> ecosystem
+            </>
+          }
+          description="From all-in-one video utilities to focused download tools, StackEarn organizes products around speed, simplicity and Android-first usability."
           center
         />
         <div className="mt-10">

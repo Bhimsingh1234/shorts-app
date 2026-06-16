@@ -37,24 +37,19 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
   return (
-    <div className="page-shell">
-      <section className="hero-section">
-        <div className="hero-copy">
-          <HeroBadge>Fast · Secure · Android-first</HeroBadge>
+    <div className="page-shell reveal-fade">
+      <section className="hero-section home-hero-section">
+        <div className="hero-copy reveal-up">
+          <HeroBadge>Fast · Free · High Quality</HeroBadge>
           <div className="mt-6">
             <SectionHeading
-              title={<>Download Shorts Videos Fast & Easy</>}
-              description="Download and manage your favorite short videos with our fast, secure and user-friendly platform."
+              title={
+                <>
+                  Download Shorts Videos <span className="text-primary">Fast & Easy</span>
+                </>
+              }
+              description="Download YouTube Shorts videos in HD quality. Save and watch offline anytime, anywhere."
             />
-          </div>
-
-          <div className="mt-8 flex flex-wrap gap-4">
-            <a href="#apps" className="btn-shell btn-shell-primary">
-              Download Android App
-            </a>
-            <a href="#apps" className="btn-shell btn-shell-outline">
-              Explore Apps
-            </a>
           </div>
 
           <div className="mt-10 max-w-3xl">
@@ -62,19 +57,32 @@ function HomePage() {
           </div>
 
           <div className="mt-8 flex flex-wrap gap-3 text-sm text-muted-foreground">
-            <span className="inline-chip"><CheckCircle2 className="h-4 w-4 text-primary" /> Fast downloads</span>
-            <span className="inline-chip"><ShieldCheck className="h-4 w-4 text-primary" /> Secure platform</span>
-            <span className="inline-chip"><Sparkles className="h-4 w-4 text-primary" /> Free to use</span>
+            <span className="inline-chip">
+              <CheckCircle2 className="h-4 w-4 text-primary" /> Fast downloads
+            </span>
+            <span className="inline-chip">
+              <ShieldCheck className="h-4 w-4 text-primary" /> Secure platform
+            </span>
+            <span className="inline-chip">
+              <Sparkles className="h-4 w-4 text-primary" /> Easy to use
+            </span>
           </div>
         </div>
 
-        <div className="hero-device">
+        <div className="hero-device reveal-up delay-1">
           <div className="device-glow" />
+          <div className="floating-card floating-card-center">
+            <div className="icon-chip icon-chip-gradient">
+              <Download className="h-5 w-5" />
+            </div>
+          </div>
           <div className="floating-card floating-card-right">
-            <div className="icon-chip icon-chip-soft"><Download className="h-5 w-5 text-primary" /></div>
+            <div className="icon-chip icon-chip-soft">
+              <Smartphone className="h-5 w-5 text-primary" />
+            </div>
             <div>
-              <div className="text-sm font-semibold text-title">Online Shorts Downloader</div>
-              <div className="text-xs text-muted-foreground">Quick save workflow</div>
+              <div className="text-sm font-semibold text-title">High Quality Download</div>
+              <div className="text-xs text-muted-foreground">Smooth and instant workflow</div>
             </div>
           </div>
           <div className="device-frame">
@@ -93,27 +101,57 @@ function HomePage() {
         </div>
       </section>
 
-      <section className="section-gap" id="downloader">
+      <section className="section-gap reveal-up" id="downloader">
+        <GradientPanel className="p-5 lg:p-6">
+          <AppShowcase />
+        </GradientPanel>
+      </section>
+
+      <section className="section-gap reveal-up delay-1">
+        <SectionHeading
+          eyebrow="Why Choose Us"
+          title={
+            <>
+              Powerful <span className="text-primary">Features</span>
+            </>
+          }
+          description="A fast, polished and trustworthy interface made for app promotion, organic growth and a better downloader experience."
+          center
+        />
+        <div className="mt-10">
+          <FeaturesGrid />
+        </div>
+      </section>
+
+      <section className="section-gap reveal-up delay-2">
+        <StatsBand />
+      </section>
+
+      <section className="section-gap reveal-up">
         <GradientPanel className="p-6 lg:p-8">
-          <div className="grid gap-8 lg:grid-cols-[1fr_1.1fr] lg:items-center">
+          <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
             <div className="space-y-4">
-              <div className="section-eyebrow">Online Shorts Downloader</div>
+              <div className="section-eyebrow">Android Downloader Ecosystem</div>
               <h2 className="text-3xl font-black tracking-tight text-title md:text-4xl">
-                Paste a video URL and move faster
+                Faster, safer and cleaner tools for every download workflow
               </h2>
               <p className="text-base leading-8 text-muted-foreground">
-                Paste your video URL and download your favorite short videos quickly and securely.
+                Discover Android tools built for shorts, reels, statuses and all-in-one video downloads with a premium UI that matches your shared reference design.
               </p>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="inline-feature compact-feature">
-                  <div className="icon-chip icon-chip-soft"><Smartphone className="h-4 w-4 text-primary" /></div>
+                  <div className="icon-chip icon-chip-soft">
+                    <Smartphone className="h-4 w-4 text-primary" />
+                  </div>
                   <div>
                     <div className="text-sm font-semibold text-title">Android ready</div>
                     <div className="text-xs text-muted-foreground">Promote app and web flows together</div>
                   </div>
                 </div>
                 <div className="inline-feature compact-feature">
-                  <div className="icon-chip icon-chip-soft"><ArrowRight className="h-4 w-4 text-primary" /></div>
+                  <div className="icon-chip icon-chip-soft">
+                    <ArrowRight className="h-4 w-4 text-primary" />
+                  </div>
                   <div>
                     <div className="text-sm font-semibold text-title">Quick access</div>
                     <div className="text-xs text-muted-foreground">Simple path from URL to action</div>
@@ -142,34 +180,16 @@ function HomePage() {
         </GradientPanel>
       </section>
 
-      <section className="section-gap">
-        <AppShowcase />
-      </section>
-
-      <section className="section-gap">
-        <SectionHeading
-          eyebrow="Why Choose StackEarn"
-          title={<>Built to support app promotion, SEO, and future growth</>}
-          description="A structured platform for product discovery, organic traffic, ad-ready trust pages, and the broader StackEarn brand ecosystem."
-          center
-        />
-        <div className="mt-10">
-          <FeaturesGrid />
-        </div>
-      </section>
-
-      <section className="section-gap">
-        <StatsBand />
-      </section>
-
-      <section className="section-gap">
+      <section className="section-gap reveal-up delay-1">
         <GradientPanel className="p-6 lg:p-8">
           <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
             <div className="space-y-4">
               <div className="section-eyebrow">Frequently Asked Questions</div>
-              <h2 className="text-3xl font-black tracking-tight text-title">Answers users expect before they trust a downloader brand</h2>
+              <h2 className="text-3xl font-black tracking-tight text-title">
+                Answers users expect before they trust a downloader brand
+              </h2>
               <p className="text-base leading-8 text-muted-foreground">
-                This homepage FAQ supports SEO, clarity, and Google AdSense-friendly trust signals while keeping the experience concise.
+                This FAQ improves trust, SEO and clarity while keeping the experience concise and mobile friendly.
               </p>
               <p className="text-sm font-semibold text-primary">{site.domain}</p>
             </div>

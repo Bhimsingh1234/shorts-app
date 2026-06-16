@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { AppWindow, Download, Shield } from "lucide-react";
 
-import { AppsGrid, SectionHeading, StatsBand } from "@/components/stackearn-site";
+import { AppsGrid, PageHero, StatsBand } from "@/components/stackearn-site";
 
 export const Route = createFileRoute("/apps")({
   head: () => ({
@@ -26,22 +27,29 @@ export const Route = createFileRoute("/apps")({
 
 function AppsPage() {
   return (
-    <div className="page-shell">
-      <section className="hero-section hero-section-tight">
-        <div className="hero-copy max-w-3xl">
-          <SectionHeading
-            eyebrow="StackEarn Apps"
-            title={<>Android tools built for faster downloads and cleaner media workflows</>}
-            description="Browse the full StackEarn app ecosystem for saving shorts, reels, statuses, and videos with Android-first simplicity."
-          />
-        </div>
-      </section>
+    <div className="page-shell reveal-fade">
+      <PageHero
+        breadcrumbs={[{ label: "Home", to: "/" }, { label: "Apps" }]}
+        eyebrow="Our Apps"
+        title={
+          <>
+            Android tools built for faster <span className="text-primary">downloads</span>
+          </>
+        }
+        description="Browse the full StackEarn app ecosystem for saving shorts, reels, statuses and videos with Android-first simplicity."
+        pills={[
+          { icon: AppWindow, label: "Multiple apps" },
+          { icon: Download, label: "Fast workflows" },
+          { icon: Shield, label: "Safe experience" },
+        ]}
+        variant="apps"
+      />
 
-      <section className="section-gap">
+      <section className="section-gap reveal-up">
         <AppsGrid />
       </section>
 
-      <section className="section-gap">
+      <section className="section-gap reveal-up delay-1">
         <StatsBand />
       </section>
     </div>
