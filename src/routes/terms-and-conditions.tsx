@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { GradientPanel, LegalCards, SectionHeading } from "@/components/stackearn-site";
+import { LegalPageContent, PageHero, legalHeroPills } from "@/components/stackearn-site";
 import { termsSections } from "@/lib/stackearn-content";
 
 export const Route = createFileRoute("/terms-and-conditions")({
@@ -15,8 +15,7 @@ export const Route = createFileRoute("/terms-and-conditions")({
       { property: "og:title", content: "Terms & Conditions — StackEarn Shorts Downloader" },
       {
         property: "og:description",
-        content:
-          "Review the terms governing use of the StackEarn website and ecosystem.",
+        content: "Review the terms governing use of the StackEarn website and ecosystem.",
       },
       { property: "og:url", content: "/terms-and-conditions" },
     ],
@@ -27,21 +26,26 @@ export const Route = createFileRoute("/terms-and-conditions")({
 
 function TermsPage() {
   return (
-    <div className="page-shell">
-      <section className="hero-section hero-section-tight">
-        <div className="hero-copy max-w-3xl">
-          <SectionHeading
-            eyebrow="Terms & Conditions"
-            title={<>The terms that shape the StackEarn platform experience</>}
-            description="This page outlines acceptance of terms, user responsibilities, service availability, intellectual property, limitation of liability, and policy updates."
-          />
-        </div>
-      </section>
+    <div className="page-shell reveal-fade">
+      <PageHero
+        breadcrumbs={[{ label: "Home", to: "/" }, { label: "Terms & Conditions" }]}
+        eyebrow="Terms & Conditions"
+        title={
+          <>
+            Terms & <span className="text-primary">Conditions</span>
+          </>
+        }
+        description="Please read these Terms & Conditions carefully before using StackEarn Shorts Downloader website and our services."
+        pills={legalHeroPills}
+        variant="terms"
+      />
 
-      <section className="section-gap">
-        <GradientPanel className="p-6 lg:p-8">
-          <LegalCards sections={termsSections} />
-        </GradientPanel>
+      <section className="section-gap reveal-up">
+        <LegalPageContent
+          sections={termsSections}
+          supportTitle="Have Questions?"
+          supportText="If you have any questions about these Terms & Conditions, feel free to contact us."
+        />
       </section>
     </div>
   );

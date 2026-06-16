@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { FAQAccordion, GradientPanel, HeroBadge, SectionHeading } from "@/components/stackearn-site";
+import { FAQAccordion, PageHero, faqHeroPills } from "@/components/stackearn-site";
 import { faqPageItems } from "@/lib/stackearn-content";
 
 export const Route = createFileRoute("/faq")({
@@ -15,8 +15,7 @@ export const Route = createFileRoute("/faq")({
       { property: "og:title", content: "StackEarn FAQ — Common Questions & Answers" },
       {
         property: "og:description",
-        content:
-          "Get answers about downloads, apps, support, and the StackEarn platform.",
+        content: "Get answers about downloads, apps, support, and the StackEarn platform.",
       },
       { property: "og:url", content: "/faq" },
     ],
@@ -27,24 +26,22 @@ export const Route = createFileRoute("/faq")({
 
 function FAQPage() {
   return (
-    <div className="page-shell">
-      <section className="hero-section hero-section-tight">
-        <div className="hero-copy max-w-3xl">
-          <HeroBadge>Answers across the ecosystem</HeroBadge>
-          <div className="mt-6">
-            <SectionHeading
-              eyebrow="Frequently Asked Questions"
-              title={<>Everything users ask about StackEarn</>}
-              description="Browse platform, app, support, and workflow questions in one organized FAQ page."
-            />
-          </div>
-        </div>
-      </section>
+    <div className="page-shell reveal-fade">
+      <PageHero
+        breadcrumbs={[{ label: "Home", to: "/" }, { label: "FAQ" }]}
+        eyebrow="FAQ"
+        title={
+          <>
+            Frequently Asked <span className="text-primary">Questions</span>
+          </>
+        }
+        description="Find answers to common questions about StackEarn Shorts Downloader and our services."
+        pills={faqHeroPills}
+        variant="faq"
+      />
 
-      <section className="section-gap">
-        <GradientPanel className="p-6 lg:p-8">
-          <FAQAccordion items={faqPageItems} />
-        </GradientPanel>
+      <section className="section-gap reveal-up">
+        <FAQAccordion items={faqPageItems} />
       </section>
     </div>
   );

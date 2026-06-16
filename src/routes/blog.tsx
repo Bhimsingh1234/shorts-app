@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { BlogGrid, GradientPanel, HeroBadge, SectionHeading } from "@/components/stackearn-site";
+import { BlogGrid, PageHero, blogHeroPills } from "@/components/stackearn-site";
 
 export const Route = createFileRoute("/blog")({
   head: () => ({
@@ -14,8 +14,7 @@ export const Route = createFileRoute("/blog")({
       { property: "og:title", content: "StackEarn Blog — Video Guides, Android Tips & Updates" },
       {
         property: "og:description",
-        content:
-          "Explore guides, tips, and updates supporting the StackEarn ecosystem.",
+        content: "Explore guides, tips, and updates supporting the StackEarn ecosystem.",
       },
       { property: "og:url", content: "/blog" },
     ],
@@ -26,24 +25,22 @@ export const Route = createFileRoute("/blog")({
 
 function BlogPage() {
   return (
-    <div className="page-shell">
-      <section className="hero-section hero-section-tight">
-        <div className="hero-copy max-w-3xl">
-          <HeroBadge>SEO-ready content hub</HeroBadge>
-          <div className="mt-6">
-            <SectionHeading
-              eyebrow="Blog"
-              title={<>Tips, guides & updates all in one place</>}
-              description="A content hub for video download guides, Android productivity tips, and StackEarn platform updates."
-            />
-          </div>
-        </div>
-      </section>
+    <div className="page-shell reveal-fade">
+      <PageHero
+        breadcrumbs={[{ label: "Home", to: "/" }, { label: "Blog" }]}
+        eyebrow="Our Blog"
+        title={
+          <>
+            Tips, Guides & Updates <span className="text-primary">All in One Place</span>
+          </>
+        }
+        description="Explore helpful guides, tips and updates about video downloading, apps and more."
+        pills={blogHeroPills}
+        variant="blog"
+      />
 
-      <section className="section-gap">
-        <GradientPanel className="p-6 lg:p-8">
-          <BlogGrid />
-        </GradientPanel>
+      <section className="section-gap reveal-up">
+        <BlogGrid />
       </section>
     </div>
   );
