@@ -79,6 +79,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "StackEarn Shorts Downloader" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:title", content: "StackEarn Shorts Downloader" },
+      { name: "twitter:title", content: "StackEarn Shorts Downloader" },
+      { name: "description", content: "Download and manage short videos easily with StackEarn Shorts Hub." },
+      { property: "og:description", content: "Download and manage short videos easily with StackEarn Shorts Hub." },
+      { name: "twitter:description", content: "Download and manage short videos easily with StackEarn Shorts Hub." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9384f7e6-bafe-48f2-bb1e-cc0a0078b0bc/id-preview-65385e0a--e2d5942a-b0d1-4b6f-a3d9-2b630cd20b9a.lovable.app-1781570690042.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9384f7e6-bafe-48f2-bb1e-cc0a0078b0bc/id-preview-65385e0a--e2d5942a-b0d1-4b6f-a3d9-2b630cd20b9a.lovable.app-1781570690042.png" },
     ],
     links: [
       {
