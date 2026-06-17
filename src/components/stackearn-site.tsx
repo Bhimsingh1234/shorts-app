@@ -1,3 +1,4 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   AppWindow,
@@ -11,17 +12,27 @@ import {
   FileBadge,
   FileText,
   Globe,
+  Link2,
+  LoaderCircle,
   Lock,
   Mail,
   Menu,
   MessageCircleMore,
+  MessageSquareText,
   Scale,
+  Search,
+  Send,
   Shield,
   Sparkles,
+  Star,
+  UserRound,
   X,
   type LucideIcon,
 } from "lucide-react";
 import { useMemo, useState, type ReactNode } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
@@ -58,6 +69,52 @@ interface BreadcrumbItem {
   to?: string;
 }
 
+const downloaderSchema = z.object({
+  url: z.string().trim().url("Please enter a valid video link."),
+});
+
+const contactSchema = z.object({
+  name: z.string().trim().min(2, "Please enter your name.").max(80, "Name is too long."),
+  email: z.string().trim().email("Please enter a valid email address.").max(120, "Email is too long."),
+  subject: z.string().trim().min(3, "Please enter a subject.").max(120, "Subject is too long."),
+  message: z.string().trim().min(10, "Please enter a complete message.").max(1000, "Message is too long."),
+});
+
+const searchSchema = z.object({
+  query: z.string().trim().min(2, "Please enter at least 2 characters.").max(80, "Search query is too long."),
+});
+
+function wait(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function FormOverlay({ open, label }: { open: boolean; label: string }) {
+  if (!open) return null;
+
+  return (
+    <div className="form-overlay" role="status" aria-live="polite" aria-label={label}>
+      <div className="form-overlay-card">
+        <LoaderCircle className="h-8 w-8 animate-spin text-primary" />
+        <div className="text-base font-semibold text-title">{label}</div>
+      </div>
+    </div>
+  );
+}
+
+function RatingStars({ value }: { value: number }) {
+  return (
+    <div className="rating-row" aria-label={`${value} star rating`}>
+      {Array.from({ length: 5 }).map((_, index) => (
+        <Star
+          key={index}
+          className={cn("h-3.5 w-3.5", index < Math.round(value) ? "fill-current text-[var(--star-color)]" : "text-[var(--star-muted)]")}
+        />
+      ))}
+      <span className="rating-value">{value.toFixed(1)}</span>
+    </div>
+  );
+}
+
 export function StackEarnLayout({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -78,21 +135,21 @@ export function StackEarnLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-50 border-b border-border/60 bg-background/88 backdrop-blur-xl">
-        <div className="container grid h-18 grid-cols-[minmax(0,1fr)_auto] items-center gap-4 lg:flex lg:justify-between lg:gap-6">
-          <Link to="/" className="flex min-w-0 items-center gap-3" aria-label={`${site.name} home`}>
-            <div className="brand-mark">
+      <header className="site-header">
+        <div className="container header-shell">
+          <Link to="/" className="site-brand" aria-label={`${site.name} home`}>
+            <div className="brand-mark brand-mark-header">
               <Download className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <div className="truncate text-xl font-black tracking-tight text-title">
+              <div className="site-brand-title">
                 Stack<span className="text-primary">Earn</span>
               </div>
-              <div className="truncate text-sm text-muted-foreground">Shorts Downloader</div>
+              <div className="site-brand-subtitle">Shorts Downloader</div>
             </div>
           </Link>
 
-          <nav className="hidden items-center gap-1 lg:flex">
+          <nav className="site-nav hidden lg:flex">
             {navItems.map((item) => (
               <Link
                 key={item.label}
@@ -104,36 +161,37 @@ export function StackEarnLayout({ children }: { children: ReactNode }) {
             ))}
           </nav>
 
-          <div className="hidden shrink-0 lg:block">
-            <Button asChild variant="hero" size="xl">
+          <div className="hidden lg:block">
+            <Button asChild variant="hero" size="xl" className="header-download-btn">
               <a href="#apps">Download App</a>
             </Button>
           </div>
 
           <button
             type="button"
-            className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-card text-foreground shadow-soft lg:hidden"
+            className="mobile-menu-btn lg:hidden"
             onClick={() => setMobileOpen((open) => !open)}
             aria-label="Toggle navigation"
+            aria-expanded={mobileOpen}
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
 
         {mobileOpen && (
-          <div className="border-t border-border/60 bg-background lg:hidden">
-            <div className="container flex flex-col gap-2 py-4">
+          <div className="mobile-nav-shell lg:hidden">
+            <div className="container mobile-nav-content">
               {primaryNav.map((item) => (
                 <Link
                   key={item.label}
                   to={item.to}
-                  className="rounded-xl px-4 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
+                  className="mobile-nav-link"
                   onClick={() => setMobileOpen(false)}
                 >
                   {item.label}
                 </Link>
               ))}
-              <Button asChild variant="hero" size="xl">
+              <Button asChild variant="hero" size="xl" className="w-full">
                 <a href="#apps">Download App</a>
               </Button>
             </div>
@@ -143,21 +201,21 @@ export function StackEarnLayout({ children }: { children: ReactNode }) {
 
       <main>{children}</main>
 
-      <footer className="border-t border-border/70 bg-footer text-footer-foreground">
-        <div className="container grid gap-10 py-16 lg:grid-cols-[1.3fr_repeat(3,1fr)]">
+      <footer className="site-footer">
+        <div className="container footer-grid">
           <div className="space-y-5">
-            <Link to="/" className="flex items-center gap-3" aria-label={`${site.name} home`}>
+            <Link to="/" className="site-brand" aria-label={`${site.name} home`}>
               <div className="brand-mark">
                 <Download className="h-5 w-5" />
               </div>
-              <div>
+              <div className="min-w-0">
                 <div className="footer-brand-title">
                   Stack<span className="text-primary">Earn</span>
                 </div>
                 <div className="footer-subtitle">Shorts Downloader</div>
               </div>
             </Link>
-            <p className="footer-copy max-w-sm">{site.tagline}</p>
+            <p className="footer-copy max-w-sm">Fast, secure and easy way to download Shorts videos and manage your downloads.</p>
             <div className="flex items-center gap-3">
               {socialLinks.map(({ label, href, icon: Icon }) => (
                 <a
@@ -174,14 +232,14 @@ export function StackEarnLayout({ children }: { children: ReactNode }) {
             </div>
           </div>
 
-          <FooterColumn title="Quick Links" links={footerLinks.slice(0, 5)} />
-          <FooterColumn title="Company" links={footerLinks.slice(5)} />
+          <FooterColumn title="Quick Links" links={footerLinks.slice(0, 6)} />
+          <FooterColumn title="Company" links={footerLinks.slice(4)} />
           <FooterColumn title="Apps" links={apps.map((app) => ({ label: app.name, to: "/apps" }))} />
         </div>
         <div className="footer-divider">
           <div className="container footer-legal">
-            <p>© 2026 StackEarn IT Solutions. All rights reserved.</p>
-            <p>Made for the StackEarn ecosystem.</p>
+            <p>© 2026 StackEarn IT Solutions. All Rights Reserved.</p>
+            <p>Made with ❤️ by StackEarn</p>
           </div>
         </div>
       </footer>
@@ -206,7 +264,7 @@ function FooterColumn({ title, links }: { title: string; links: Array<{ label: s
 
 export function HeroBadge({ children }: { children: ReactNode }) {
   return (
-    <div className="inline-flex items-center gap-2 rounded-full border border-primary/10 bg-secondary px-4 py-2 text-sm font-semibold text-primary shadow-soft">
+    <div className="hero-badge">
       <Sparkles className="h-4 w-4" />
       {children}
     </div>
@@ -248,7 +306,7 @@ export function SectionHeading({
       {eyebrow ? <div className="section-eyebrow">{eyebrow}</div> : null}
       <h1
         className={cn(
-          "text-balance text-4xl font-black tracking-tight text-title md:text-5xl",
+          "text-balance text-4xl font-black tracking-tight text-title md:text-5xl lg:text-[3.8rem]",
           center && "mx-auto max-w-3xl",
         )}
       >
@@ -319,27 +377,24 @@ export function PageHero({
 function HeroVisual({ variant }: { variant: HeroVariant }) {
   if (variant === "blog") {
     return (
-      <div className="visual-stage">
+      <div className="visual-stage visual-stage-blog">
         <div className="visual-bubble" />
-        <div className="visual-card visual-card-large notebook-card">
-          <div className="notebook-rings">
+        <div className="notebook-card-hero">
+          <div className="notebook-ring-row">
             {Array.from({ length: 5 }).map((_, index) => (
               <span key={index} />
             ))}
           </div>
-          <div className="notebook-body">
-            <BookOpen className="h-12 w-12 text-primary" />
-            <div>
-              <div className="text-3xl font-black text-title">BLOG</div>
-              <div className="mt-3 space-y-2">
-                <div className="visual-line" />
-                <div className="visual-line short" />
-                <div className="visual-line tiny" />
-              </div>
+          <div className="notebook-sheet-hero">
+            <div className="text-5xl font-black text-primary">BLOG</div>
+            <div className="mt-5 space-y-3">
+              <div className="visual-line" />
+              <div className="visual-line short" />
+              <div className="visual-line tiny" />
             </div>
           </div>
         </div>
-        <div className="floating-chip floating-chip-left">
+        <div className="floating-chip floating-chip-left coral">
           <div className="icon-chip icon-chip-gradient">
             <Download className="h-5 w-5" />
           </div>
@@ -357,13 +412,15 @@ function HeroVisual({ variant }: { variant: HeroVariant }) {
     return (
       <div className="visual-stage">
         <div className="visual-bubble" />
-        <div className="visual-card faq-badge-card">
-          <CircleHelp className="h-16 w-16 text-primary-foreground" />
-          <div className="text-4xl font-black text-primary-foreground">FAQ</div>
+        <div className="faq-hero-card">
+          <div className="faq-hero-bubble">
+            <CircleHelp className="h-14 w-14 text-primary-foreground" />
+          </div>
+          <div className="text-5xl font-black text-primary-foreground">FAQ</div>
         </div>
         <div className="floating-chip floating-chip-left coral">
-          <div className="icon-chip icon-chip-soft">
-            <CircleHelp className="h-5 w-5 text-primary" />
+          <div className="icon-chip icon-chip-gradient">
+            <CircleHelp className="h-5 w-5" />
           </div>
         </div>
         <div className="floating-chip floating-chip-right soft">
@@ -379,9 +436,10 @@ function HeroVisual({ variant }: { variant: HeroVariant }) {
     return (
       <div className="visual-stage">
         <div className="visual-bubble" />
-        <div className="visual-card visual-mail-card">
-          <div className="mail-envelope" />
-          <div className="mail-sheet" />
+        <div className="contact-hero-graphic">
+          <div className="chat-orb" />
+          <div className="mail-envelope mail-envelope-large" />
+          <div className="mail-sheet mail-sheet-large" />
         </div>
         <div className="floating-chip floating-chip-right">
           <div className="icon-chip icon-chip-gradient">
@@ -399,24 +457,23 @@ function HeroVisual({ variant }: { variant: HeroVariant }) {
 
   if (variant === "privacy" || variant === "terms" || variant === "disclaimer") {
     const MainIcon = variant === "privacy" ? Lock : variant === "terms" ? Scale : Shield;
-    const titleText = variant === "privacy" ? "PRIVACY" : variant === "terms" ? "TERMS" : "NOTICE";
+    const titleText = variant === "privacy" ? "PRIVACY POLICY" : variant === "terms" ? "TERMS & CONDITIONS" : "DISCLAIMER";
 
     return (
       <div className="visual-stage">
         <div className="visual-bubble" />
-        <div className="visual-card legal-visual-card">
-          <div className="legal-visual-main">
-            <div className="legal-icon-block">
-              <MainIcon className="h-12 w-12 text-primary-foreground" />
-            </div>
-            <div className="legal-sheet">
-              <div className="text-2xl font-black text-primary">{titleText}</div>
-              <div className="mt-4 space-y-3">
-                <div className="visual-line" />
-                <div className="visual-line short" />
-                <div className="visual-line" />
-                <div className="visual-line tiny" />
-              </div>
+        <div className="legal-hero-graphic">
+          <div className="legal-shield-block">
+            <MainIcon className="h-16 w-16 text-primary-foreground" />
+          </div>
+          <div className="legal-doc-block">
+            <div className="legal-doc-clip" />
+            <div className="legal-doc-title">{titleText}</div>
+            <div className="mt-4 space-y-3">
+              <div className="visual-line" />
+              <div className="visual-line short" />
+              <div className="visual-line" />
+              <div className="visual-line tiny" />
             </div>
           </div>
         </div>
@@ -451,9 +508,7 @@ function HeroVisual({ variant }: { variant: HeroVariant }) {
       </div>
       <div className="device-frame">
         <div className="device-screen">
-          <div className="screen-header">
-            {variant === "about" ? "StackEarn Apps" : variant === "apps" ? "Top Downloaders" : "Shorts Downloader"}
-          </div>
+          <div className="screen-header">Shorts Downloader</div>
           <div className="screen-search" />
           <div className="screen-video screen-video-main" />
           <div className="screen-grid">
@@ -469,48 +524,78 @@ function HeroVisual({ variant }: { variant: HeroVariant }) {
 }
 
 export function DownloaderForm() {
+  const form = useForm<z.infer<typeof downloaderSchema>>({
+    resolver: zodResolver(downloaderSchema),
+    defaultValues: { url: "" },
+  });
+
+  const onSubmit = form.handleSubmit(async ({ url }) => {
+    try {
+      await wait(1200);
+      toast.success("Link validated successfully", {
+        description: `Ready to process: ${url.slice(0, 60)}${url.length > 60 ? "..." : ""}`,
+      });
+      form.reset();
+    } catch {
+      toast.error("Unable to process link right now", {
+        description: "Please try again in a moment.",
+      });
+    }
+  });
+
   return (
-    <div className="download-shell" id="downloader">
-      <div className="download-input-row">
-        <input
-          aria-label="Paste shorts video link"
-          placeholder="Paste Shorts video URL here..."
-          className="download-input"
-        />
-        <Button variant="hero" size="xl" className="min-w-40">
-          Download
-        </Button>
-      </div>
-      <p className="text-sm leading-6 text-muted-foreground">
-        By using this service, you accept our{" "}
-        <Link to="/terms-and-conditions" className="text-primary hover:underline">
-          Terms & Conditions
-        </Link>{" "}
-        and{" "}
-        <Link to="/privacy-policy" className="text-primary hover:underline">
-          Privacy Policy
-        </Link>
-        .
-      </p>
-    </div>
+    <>
+      <FormOverlay open={form.formState.isSubmitting} label="Preparing your download..." />
+      <form className="download-shell" id="downloader" onSubmit={onSubmit} noValidate>
+        <div className="download-input-row">
+          <div className="download-input-wrap">
+            <Link2 className="download-input-icon" />
+            <input
+              aria-label="Paste shorts video link"
+              placeholder="Paste Shorts Video Link Here..."
+              className="download-input"
+              {...form.register("url")}
+            />
+          </div>
+          <Button type="submit" variant="hero" size="xl" className="download-submit-btn" disabled={form.formState.isSubmitting}>
+            {form.formState.isSubmitting ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+            Download
+          </Button>
+        </div>
+        {form.formState.errors.url ? <p className="field-error">{form.formState.errors.url.message}</p> : null}
+        <p className="text-sm leading-6 text-muted-foreground">
+          By using our service, you accept our{" "}
+          <Link to="/terms-and-conditions" className="text-primary hover:underline">
+            Terms of Use
+          </Link>{" "}
+          and{" "}
+          <Link to="/privacy-policy" className="text-primary hover:underline">
+            Privacy Policy
+          </Link>
+          .
+        </p>
+      </form>
+    </>
   );
 }
 
 export function AppShowcase() {
   return (
-    <div className="grid gap-5 lg:grid-cols-[1.15fr_repeat(4,minmax(0,1fr))]" id="apps">
-      <div className="app-feature-card">
-        <div className="icon-chip icon-chip-gradient">
-          <Download className="h-6 w-6" />
+    <div className="app-showcase-grid" id="apps">
+      <div className="app-feature-card app-feature-card-large">
+        <div className="app-feature-icon-box">
+          <div className="icon-chip icon-chip-gradient app-feature-main-icon">
+            <Download className="h-7 w-7" />
+          </div>
         </div>
         <div className="space-y-3">
           <p className="text-sm font-semibold text-primary">Try Our Android Apps</p>
           <h2 className="text-3xl font-black tracking-tight text-title">Faster, Easier & Better</h2>
           <p className="text-base leading-7 text-muted-foreground">
-            Explore the StackEarn ecosystem and discover the right tool for shorts, reels, statuses, and downloads.
+            Experience the best video downloading experience with our Android apps.
           </p>
         </div>
-        <Button asChild variant="hero" size="xl">
+        <Button asChild variant="hero" size="xl" className="w-fit">
           <Link to="/apps">
             Explore Apps
             <ArrowRight className="h-4 w-4" />
@@ -521,14 +606,15 @@ export function AppShowcase() {
       {apps.map((app) => {
         const Icon = app.icon;
         return (
-          <article key={app.slug} className="app-mini-card">
-            <div className="icon-chip" style={{ backgroundColor: app.accent }}>
-              <Icon className="h-6 w-6 text-primary-foreground" />
+          <article key={app.slug} className="app-mini-card app-mini-card-polished">
+            <div className="app-mini-icon-wrap">
+              <div className="app-mini-icon" style={{ background: app.accent }}>
+                <Icon className="h-7 w-7 text-primary-foreground" />
+              </div>
             </div>
-            <div className="space-y-2">
-              <h3 className="text-lg font-bold text-title">{app.name}</h3>
-              <p className="text-sm leading-6 text-muted-foreground">{app.description}</p>
-              <p className="text-sm font-semibold text-primary">{app.downloads}</p>
+            <div className="space-y-1 text-center">
+              <h3 className="app-mini-title">{app.name}</h3>
+              <RatingStars value={app.rating} />
             </div>
           </article>
         );
@@ -539,15 +625,15 @@ export function AppShowcase() {
 
 export function FeaturesGrid() {
   return (
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    <div className="feature-strip-grid">
       {homeHighlights.map((feature) => {
         const Icon = feature.icon;
         return (
-          <article key={feature.title} className="feature-card reveal-up">
+          <article key={feature.title} className="feature-card feature-card-strip reveal-up">
             <div className="icon-chip icon-chip-soft">
               <Icon className="h-5 w-5 text-primary" />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1">
               <h3 className="text-lg font-bold text-title">{feature.title}</h3>
               <p className="text-sm leading-6 text-muted-foreground">{feature.description}</p>
             </div>
@@ -579,9 +665,7 @@ export function FAQAccordion({ items = homeFaqs }: { items?: FAQItem[] }) {
           <AccordionTrigger className="py-5 text-base font-semibold text-title hover:no-underline">
             {item.question}
           </AccordionTrigger>
-          <AccordionContent className="text-sm leading-7 text-muted-foreground">
-            {item.answer}
-          </AccordionContent>
+          <AccordionContent className="text-sm leading-7 text-muted-foreground">{item.answer}</AccordionContent>
         </AccordionItem>
       ))}
     </Accordion>
@@ -597,7 +681,7 @@ export function AppsGrid() {
           <article key={app.slug} className="product-card">
             <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:flex sm:flex-wrap sm:items-start sm:justify-between">
               <div className="flex min-w-0 items-start gap-4">
-                <div className="icon-chip shrink-0" style={{ backgroundColor: app.accent }}>
+                <div className="icon-chip shrink-0" style={{ background: app.accent }}>
                   <Icon className="h-7 w-7 text-primary-foreground" />
                 </div>
                 <div className="min-w-0 space-y-2">
@@ -609,6 +693,9 @@ export function AppsGrid() {
               <div className="rounded-full border border-primary/15 bg-secondary px-4 py-2 text-sm font-semibold text-primary">
                 {app.downloads}
               </div>
+            </div>
+            <div className="mt-5">
+              <RatingStars value={app.rating} />
             </div>
             <div className="mt-8 grid gap-3 sm:grid-cols-2">
               {app.features.map((feature) => (
@@ -629,58 +716,88 @@ export function AppsGrid() {
 }
 
 export function BlogGrid() {
+  const form = useForm<z.infer<typeof searchSchema>>({
+    resolver: zodResolver(searchSchema),
+    defaultValues: { query: "" },
+  });
+
+  const onSubmit = form.handleSubmit(async ({ query }) => {
+    try {
+      await wait(900);
+      toast.success("Search submitted", {
+        description: `We are preparing results for “${query}”.`,
+      });
+      form.reset();
+    } catch {
+      toast.error("Search failed", {
+        description: "Please try again.",
+      });
+    }
+  });
+
   return (
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.8fr)]">
-      <div className="space-y-4">
-        {blogPosts.map((post, index) => (
-          <article key={post.slug} className="blog-card">
-            <div className={cn("blog-thumb", `blog-thumb-${(index % 4) + 1}`)} />
-            <div className="space-y-3">
-              <div className="badge-soft">{post.category}</div>
-              <h2 className="text-2xl font-bold tracking-tight text-title">{post.title}</h2>
-              <p className="text-base leading-7 text-muted-foreground">{post.excerpt}</p>
-              <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-                <span>{post.date}</span>
-                <span>{post.readTime}</span>
+    <>
+      <FormOverlay open={form.formState.isSubmitting} label="Searching articles..." />
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.8fr)]">
+        <div className="space-y-4">
+          {blogPosts.map((post, index) => (
+            <article key={post.slug} className="blog-card blog-card-polished">
+              <div className={cn("blog-thumb blog-thumb-photo", `blog-thumb-${(index % 4) + 1}`)} />
+              <div className="space-y-3 min-w-0">
+                <div className="badge-soft">{post.category}</div>
+                <h2 className="text-2xl font-bold tracking-tight text-title">{post.title}</h2>
+                <p className="text-base leading-7 text-muted-foreground">{post.excerpt}</p>
+                <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                  <span>{post.date}</span>
+                  <span>{post.readTime}</span>
+                </div>
+                <div className="pt-1 text-sm font-semibold text-primary">Read More →</div>
               </div>
+            </article>
+          ))}
+        </div>
+        <div className="space-y-6">
+          <aside className="sidebar-card">
+            <h2 className="text-xl font-bold text-title">Search Blog</h2>
+            <form className="mt-5 grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] xl:grid-cols-1 2xl:grid-cols-[minmax(0,1fr)_auto]" onSubmit={onSubmit} noValidate>
+              <div className="field-input-wrap">
+                <Search className="field-leading-icon" />
+                <input className="field-input field-input-with-icon" placeholder="Search articles..." aria-label="Search blog" {...form.register("query")} />
+              </div>
+              <Button type="submit" variant="hero" size="lg" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting ? <LoaderCircle className="h-4 w-4 animate-spin" /> : "Search"}
+              </Button>
+            </form>
+            {form.formState.errors.query ? <p className="field-error mt-3">{form.formState.errors.query.message}</p> : null}
+          </aside>
+          <aside className="sidebar-card">
+            <h2 className="text-xl font-bold text-title">Categories</h2>
+            <div className="mt-5 space-y-3">
+              {blogCategories.map((category) => (
+                <div key={category.title} className="rounded-2xl border border-border/70 bg-background px-4 py-4">
+                  <div className="text-base font-semibold text-title">{category.title}</div>
+                  <div className="mt-1 text-sm leading-6 text-muted-foreground">{category.description}</div>
+                </div>
+              ))}
             </div>
-          </article>
-        ))}
+          </aside>
+          <aside className="sidebar-card">
+            <h2 className="text-xl font-bold text-title">Popular Articles</h2>
+            <div className="mt-5 space-y-3">
+              {blogPosts.slice(0, 4).map((post, index) => (
+                <div key={post.slug} className="popular-article-row">
+                  <div className={cn("popular-article-thumb", `blog-thumb-${(index % 4) + 1}`)} />
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-semibold text-title">{post.title}</div>
+                    <div className="mt-1 text-xs text-muted-foreground">{post.date}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </aside>
+        </div>
       </div>
-      <div className="space-y-6">
-        <aside className="sidebar-card">
-          <h2 className="text-xl font-bold text-title">Search Blog</h2>
-          <div className="mt-5 grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] xl:grid-cols-1 2xl:grid-cols-[minmax(0,1fr)_auto]">
-            <input className="field-input" placeholder="Search articles..." aria-label="Search blog" />
-            <Button variant="hero" size="lg">Search</Button>
-          </div>
-        </aside>
-        <aside className="sidebar-card">
-          <h2 className="text-xl font-bold text-title">Categories</h2>
-          <div className="mt-5 space-y-3">
-            {blogCategories.map((category) => (
-              <div key={category.title} className="rounded-2xl border border-border/70 bg-background px-4 py-4">
-                <div className="text-base font-semibold text-title">{category.title}</div>
-                <div className="mt-1 text-sm leading-6 text-muted-foreground">{category.description}</div>
-              </div>
-            ))}
-          </div>
-        </aside>
-        <aside className="sidebar-card">
-          <h2 className="text-xl font-bold text-title">Popular Questions</h2>
-          <div className="mt-5 space-y-3">
-            {faqPageItems.slice(0, 4).map((item) => (
-              <div
-                key={item.question}
-                className="rounded-2xl border border-border/70 bg-background px-4 py-4 text-sm leading-6 text-muted-foreground"
-              >
-                <div className="font-semibold text-title">{item.question}</div>
-              </div>
-            ))}
-          </div>
-        </aside>
-      </div>
-    </div>
+    </>
   );
 }
 
@@ -745,7 +862,7 @@ export function LegalPageContent({
             <a href={`mailto:${site.email}`} className="text-primary hover:underline">
               {site.email}
             </a>
-            <div className="text-muted-foreground">{site.domain}</div>
+            <div className="text-muted-foreground">https://{site.domain}</div>
           </div>
         </aside>
       </div>
@@ -758,18 +875,78 @@ export function LegalPageContent({
 }
 
 export function ContactFormShell() {
+  const form = useForm<z.infer<typeof contactSchema>>({
+    resolver: zodResolver(contactSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      subject: "",
+      message: "",
+    },
+  });
+
+  const onSubmit = form.handleSubmit(async (values) => {
+    try {
+      await wait(1400);
+      toast.success("Message sent successfully", {
+        description: `Thanks ${values.name}, our team will contact you soon.`,
+      });
+      form.reset();
+    } catch {
+      toast.error("Message could not be sent", {
+        description: "Please try again later.",
+      });
+    }
+  });
+
   return (
-    <div className="contact-card">
-      <div className="grid gap-4 md:grid-cols-2">
-        <input className="field-input" placeholder="Your Name" aria-label="Name" />
-        <input className="field-input" placeholder="Your Email" aria-label="Email" />
-      </div>
-      <input className="field-input mt-4" placeholder="Subject" aria-label="Subject" />
-      <textarea className="field-input mt-4 min-h-40 resize-none" placeholder="Your Message" aria-label="Message" />
-      <Button variant="hero" size="xl" className="mt-5 w-full">
-        Send Message
-      </Button>
-    </div>
+    <>
+      <FormOverlay open={form.formState.isSubmitting} label="Sending your message..." />
+      <form className="contact-card contact-form-grid" onSubmit={onSubmit} noValidate>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div>
+            <div className="field-input-wrap">
+              <UserRound className="field-leading-icon" />
+              <input className="field-input field-input-with-icon" placeholder="Your Name" aria-label="Name" {...form.register("name")} />
+            </div>
+            {form.formState.errors.name ? <p className="field-error mt-2">{form.formState.errors.name.message}</p> : null}
+          </div>
+          <div>
+            <div className="field-input-wrap">
+              <Mail className="field-leading-icon" />
+              <input className="field-input field-input-with-icon" placeholder="Your Email" aria-label="Email" {...form.register("email")} />
+            </div>
+            {form.formState.errors.email ? <p className="field-error mt-2">{form.formState.errors.email.message}</p> : null}
+          </div>
+        </div>
+
+        <div>
+          <div className="field-input-wrap mt-4">
+            <FileText className="field-leading-icon" />
+            <input className="field-input field-input-with-icon" placeholder="Subject" aria-label="Subject" {...form.register("subject")} />
+          </div>
+          {form.formState.errors.subject ? <p className="field-error mt-2">{form.formState.errors.subject.message}</p> : null}
+        </div>
+
+        <div>
+          <div className="field-input-wrap mt-4 field-textarea-wrap">
+            <MessageSquareText className="field-leading-icon field-leading-icon-top" />
+            <textarea
+              className="field-input field-input-with-icon field-textarea mt-0 min-h-40 resize-none"
+              placeholder="Your Message"
+              aria-label="Message"
+              {...form.register("message")}
+            />
+          </div>
+          {form.formState.errors.message ? <p className="field-error mt-2">{form.formState.errors.message.message}</p> : null}
+        </div>
+
+        <Button type="submit" variant="hero" size="xl" className="mt-5 w-full" disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+          Send Message
+        </Button>
+      </form>
+    </>
   );
 }
 

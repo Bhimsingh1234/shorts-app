@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ArrowRight, CheckCircle2, Download, ShieldCheck, Smartphone, Sparkles } from "lucide-react";
 
+import homePhoneAsset from "@/assets/stackearn-home-phone-cutout.png.asset.json";
 import {
   AppShowcase,
   DownloaderForm,
@@ -69,34 +70,27 @@ function HomePage() {
           </div>
         </div>
 
-        <div className="hero-device reveal-up delay-1">
+        <div className="hero-device hero-device-home reveal-up delay-1">
           <div className="device-glow" />
-          <div className="floating-card floating-card-center">
+          <div className="floating-card floating-card-center floating-card-download-only">
             <div className="icon-chip icon-chip-gradient">
-              <Download className="h-5 w-5" />
+              <Download className="h-6 w-6" />
             </div>
           </div>
-          <div className="floating-card floating-card-right">
-            <div className="icon-chip icon-chip-soft">
-              <Smartphone className="h-5 w-5 text-primary" />
-            </div>
+          <div className="floating-card floating-card-right home-quality-card">
+            <div className="quality-badge">HD</div>
             <div>
-              <div className="text-sm font-semibold text-title">High Quality Download</div>
-              <div className="text-xs text-muted-foreground">Smooth and instant workflow</div>
+              <div className="text-sm font-semibold text-title">High Quality</div>
+              <div className="text-xs text-muted-foreground">Download</div>
             </div>
           </div>
-          <div className="device-frame">
-            <div className="device-screen">
-              <div className="screen-header">Shorts Downloader</div>
-              <div className="screen-search" />
-              <div className="screen-video screen-video-main" />
-              <div className="screen-grid">
-                <div className="screen-card violet" />
-                <div className="screen-card coral" />
-                <div className="screen-card mint" />
-                <div className="screen-card pink" />
-              </div>
-            </div>
+          <div className="device-frame device-frame-home">
+            <img
+              src={homePhoneAsset.url}
+              alt="StackEarn Shorts Downloader mobile app preview"
+              className="home-phone-image"
+              loading="eager"
+            />
           </div>
         </div>
       </section>

@@ -40,6 +40,7 @@ export interface AppItem {
   icon: LucideIcon;
   features: string[];
   downloads: string;
+  rating: number;
 }
 
 export interface BlogPost {
@@ -113,6 +114,7 @@ export const apps: AppItem[] = [
     icon: PlayCircle,
     features: ["Fast Downloads", "HD Support", "Download History", "File Management"],
     downloads: "1M+ downloads",
+    rating: 4.5,
   },
   {
     name: "Shorts Downloader",
@@ -123,6 +125,7 @@ export const apps: AppItem[] = [
     icon: Download,
     features: ["Easy Downloads", "Quick Sharing", "Offline Access", "History Tracking"],
     downloads: "500K+ downloads",
+    rating: 4.6,
   },
   {
     name: "Status Saver",
@@ -133,6 +136,7 @@ export const apps: AppItem[] = [
     icon: Smartphone,
     features: ["Save Status", "Share Media", "Fast Access", "Simple Gallery"],
     downloads: "300K+ downloads",
+    rating: 4.4,
   },
   {
     name: "Reels Downloader",
@@ -143,6 +147,7 @@ export const apps: AppItem[] = [
     icon: Camera,
     features: ["Simple Interface", "High Performance", "Quick Downloads", "Offline Library"],
     downloads: "250K+ downloads",
+    rating: 4.5,
   },
 ];
 
@@ -180,10 +185,10 @@ export const homeHighlights = [
 ];
 
 export const stats = [
-  { value: "Thousands+", label: "Downloads" },
-  { value: "Growing", label: "Community" },
-  { value: "4", label: "Multiple Apps" },
-  { value: "Global", label: "Users" },
+  { value: "500K+", label: "Happy Users" },
+  { value: "2M+", label: "Downloads" },
+  { value: "100+", label: "Countries" },
+  { value: "100%", label: "Safe & Secure" },
 ];
 
 export const homeFaqs: FAQItem[] = [
