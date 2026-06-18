@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ArrowRight, CheckCircle2, Download, ShieldCheck, Smartphone, Sparkles } from "lucide-react";
 
-import homePhoneAsset from "@/assets/stackearn-home-phone-cutout.png.asset.json";
+import homePhoneImage from "@/assets/stackearn-home-phone-cutout.png";
 import {
   AppShowcase,
   DownloaderForm,
