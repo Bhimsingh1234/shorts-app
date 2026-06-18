@@ -1716,7 +1716,9 @@
     .container,
     .page-shell,
     .site-footer .container {
-      width: min(1280px, calc(100% - 2.5rem));
+      width: min(1280px, calc(100% - 2rem));
+      margin-inline: auto;
+      padding-inline: 0;
     }
 
     .site-footer .footer-grid,
