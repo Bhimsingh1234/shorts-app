@@ -84,12 +84,17 @@ function HomePage() {
             </div>
           </div>
           <div className="device-frame device-frame-home">
-            <img
-              src={homePhoneImage}
-              alt="StackEarn Shorts Downloader mobile app preview"
-              className="home-phone-image"
-              loading="eager"
-            />
+            <div className="device-screen">
+              <div className="screen-header">Shorts Downloader</div>
+              <div className="screen-search" />
+              <div className="screen-video screen-video-main" />
+              <div className="screen-grid">
+                <div className="screen-card violet" />
+                <div className="screen-card coral" />
+                <div className="screen-card mint" />
+                <div className="screen-card pink" />
+              </div>
+            </div>
           </div>
         </div>
       </section>
