@@ -1724,7 +1724,7 @@
 
     .site-footer .footer-grid,
     .site-footer .footer-legal {
-      padding-inline: 0;
+      padding-inline: 1.25rem;
     }
 
     .header-shell {
