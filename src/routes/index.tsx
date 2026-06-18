@@ -86,7 +86,7 @@ function HomePage() {
           </div>
           <div className="device-frame device-frame-home">
             <img
-              src={homePhoneAsset.url}
+              src={homePhoneImage}
               alt="StackEarn Shorts Downloader mobile app preview"
               className="home-phone-image"
               loading="eager"
