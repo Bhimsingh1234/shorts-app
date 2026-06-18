@@ -523,29 +523,133 @@ function HeroVisual({ variant }: { variant: HeroVariant }) {
   );
 }
 
+const DOWNLOAD_API = "https://shortsapi.stackearn.com/api/download";
+
+/**
+ * Extract a downloadable URL from a flexible API response shape.
+ * Supports common keys: downloadUrl, url, link, video, data.url, etc.
+ */
+function pickDownloadUrl(payload: unknown): string | null {
+  if (!payload || typeof payload !== "object") return null;
+  const obj = payload as Record<string, unknown>;
+  const candidates = [
+    obj.downloadUrl,
+    obj.download_url,
+    obj.url,
+    obj.link,
+    obj.video,
+    obj.videoUrl,
+    (obj.data as Record<string, unknown> | undefined)?.url,
+    (obj.data as Record<string, unknown> | undefined)?.downloadUrl,
+    (obj.result as Record<string, unknown> | undefined)?.url,
+  ];
+  for (const c of candidates) {
+    if (typeof c === "string" && c.startsWith("http")) return c;
+  }
+  return null;
+}
+
+/**
+ * Fetches the remote video as a Blob and triggers a browser download.
+ * Falls back to opening the URL in a new tab when CORS blocks the fetch.
+ */
+async function triggerDownload(fileUrl: string, suggestedName: string, onProgress?: (pct: number) => void) {
+  try {
+    const res = await fetch(fileUrl);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const total = Number(res.headers.get("content-length") || 0);
+    const reader = res.body?.getReader();
+    if (!reader) throw new Error("No stream");
+    const chunks: Uint8Array[] = [];
+    let loaded = 0;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (value) {
+        chunks.push(value);
+        loaded += value.length;
+        if (total && onProgress) onProgress(Math.round((loaded / total) * 100));
+      }
+    }
+    const blob = new Blob(chunks as BlobPart[], { type: res.headers.get("content-type") || "video/mp4" });
+    const objUrl = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = objUrl;
+    a.download = suggestedName;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(objUrl), 1500);
+  } catch {
+    // CORS or network fallback — open in new tab so the browser saves it
+    const a = document.createElement("a");
+    a.href = fileUrl;
+    a.download = suggestedName;
+    a.target = "_blank";
+    a.rel = "noopener";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+}
+
 export function DownloaderForm() {
   const form = useForm<z.infer<typeof downloaderSchema>>({
     resolver: zodResolver(downloaderSchema),
     defaultValues: { url: "" },
   });
+  const [progress, setProgress] = useState<number | null>(null);
 
   const onSubmit = form.handleSubmit(async ({ url }) => {
+    setProgress(null);
     try {
-      await wait(1200);
-      toast.success("Link validated successfully", {
-        description: `Ready to process: ${url.slice(0, 60)}${url.length > 60 ? "..." : ""}`,
+      const { getDeviceId } = await import("@/lib/device-id");
+      const deviceId = getDeviceId();
+
+      const res = await fetch(DOWNLOAD_API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ deviceId, url }),
       });
+
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        throw new Error(text || `Request failed (${res.status})`);
+      }
+
+      const data = await res.json().catch(() => ({}));
+      const downloadUrl = pickDownloadUrl(data);
+      if (!downloadUrl) {
+        toast.error("No downloadable link returned", {
+          description: "The server didn't return a video URL. Please try a different link.",
+        });
+        return;
+      }
+
+      toast.success("Starting download...", { description: "Your file is being saved." });
+      const fileName = `stackearn-${Date.now()}.mp4`;
+      setProgress(0);
+      await triggerDownload(downloadUrl, fileName, (p) => setProgress(p));
+      setProgress(null);
+      toast.success("Download complete", { description: "Check your Downloads folder or gallery." });
       form.reset();
-    } catch {
-      toast.error("Unable to process link right now", {
-        description: "Please try again in a moment.",
-      });
+    } catch (err) {
+      setProgress(null);
+      const message = err instanceof Error ? err.message : "Unknown error";
+      if (typeof navigator !== "undefined" && !navigator.onLine) {
+        toast.error("You're offline", { description: "Check your internet connection and try again." });
+      } else {
+        toast.error("Unable to process link", { description: message.slice(0, 140) });
+      }
     }
   });
 
+  const busy = form.formState.isSubmitting;
+  const overlayLabel = progress != null ? `Downloading... ${progress}%` : "Fetching your video...";
+
   return (
     <>
-      <FormOverlay open={form.formState.isSubmitting} label="Preparing your download..." />
+      <FormOverlay open={busy} label={overlayLabel} />
       <form className="download-shell" id="downloader" onSubmit={onSubmit} noValidate>
         <div className="download-input-row">
           <div className="download-input-wrap">
@@ -557,9 +661,9 @@ export function DownloaderForm() {
               {...form.register("url")}
             />
           </div>
-          <Button type="submit" variant="hero" size="xl" className="download-submit-btn" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-            Download
+          <Button type="submit" variant="hero" size="xl" className="download-submit-btn" disabled={busy}>
+            {busy ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+            {busy && progress != null ? `${progress}%` : "Download"}
           </Button>
         </div>
         {form.formState.errors.url ? <p className="field-error">{form.formState.errors.url.message}</p> : null}

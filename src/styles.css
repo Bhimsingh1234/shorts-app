@@ -1714,8 +1714,14 @@
 @media (max-width: 768px) {
   @layer components {
     .container,
-    .page-shell {
-      width: min(1280px, calc(100% - 1.25rem));
+    .page-shell,
+    .site-footer .container {
+      width: min(1280px, calc(100% - 2.5rem));
+    }
+
+    .site-footer .footer-grid,
+    .site-footer .footer-legal {
+      padding-inline: 0;
     }
 
     .header-shell {
