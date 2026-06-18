@@ -1364,14 +1364,6 @@
     transform: rotate(7deg);
   }
 
-  .home-phone-image {
-    display: block;
-    width: 100%;
-    height: auto;
-    object-fit: contain;
-    mix-blend-mode: multiply;
-    filter: drop-shadow(0 34px 40px color-mix(in oklab, black 20%, transparent));
-  }
 
   .floating-card-download-only {
     left: 6%;
