@@ -243,7 +243,33 @@ export function StackEarnLayout({ children }: { children: ReactNode }) {
           </div>
         </div>
       </footer>
+      <WhatsAppFloatingButton />
     </div>
+  );
+}
+
+export function WhatsAppFloatingButton() {
+  const phone = "917850972904";
+  const message =
+    "Hello StackEarn Team,\n\nI am using your Shorts Downloader website and I have a query/feedback regarding the service.\n\nPlease assist me.\n\nThank you.";
+  const href = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="whatsapp-fab"
+      aria-label="Chat with us on WhatsApp"
+    >
+      <span className="whatsapp-fab-tooltip">Need Help? Chat on WhatsApp</span>
+      <span className="whatsapp-fab-pulse" aria-hidden="true" />
+      <svg viewBox="0 0 32 32" className="whatsapp-fab-icon" aria-hidden="true">
+        <path
+          fill="currentColor"
+          d="M19.11 17.39c-.28-.14-1.64-.81-1.9-.9-.25-.09-.44-.14-.62.14-.18.28-.71.9-.87 1.08-.16.18-.32.21-.6.07-.28-.14-1.17-.43-2.23-1.37-.82-.73-1.38-1.63-1.54-1.91-.16-.28-.02-.43.12-.57.13-.13.28-.32.42-.49.14-.16.18-.28.28-.46.09-.18.05-.35-.02-.49-.07-.14-.62-1.5-.85-2.06-.22-.54-.45-.46-.62-.47l-.53-.01c-.18 0-.49.07-.74.35-.25.28-.97.95-.97 2.32 0 1.37.99 2.69 1.13 2.87.14.18 1.95 2.97 4.72 4.17.66.28 1.18.45 1.58.58.66.21 1.27.18 1.75.11.53-.08 1.64-.67 1.87-1.31.23-.65.23-1.2.16-1.31-.07-.12-.25-.18-.53-.32zM16.02 4C9.39 4 4 9.39 4 16c0 2.12.55 4.11 1.52 5.85L4 28l6.32-1.65A11.94 11.94 0 0 0 16.02 28C22.65 28 28 22.62 28 16S22.65 4 16.02 4z"
+        />
+      </svg>
+    </a>
   );
 }
 
