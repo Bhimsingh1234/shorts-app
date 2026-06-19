@@ -712,40 +712,39 @@ export function DownloaderForm() {
 export function AppShowcase() {
   return (
     <div className="app-showcase-grid" id="apps">
-      <div className="app-feature-card app-feature-card-large">
-        <div className="app-feature-icon-box">
-          <div className="icon-chip icon-chip-gradient app-feature-main-icon">
-            <Download className="h-7 w-7" />
-          </div>
+      <div className="app-feature-card app-feature-card-compact">
+        <div className="app-feature-compact-icon">
+          <Download className="h-9 w-9" />
         </div>
-        <div className="space-y-3">
-          <p className="text-sm font-semibold text-primary">Try Our Android Apps</p>
-          <h2 className="text-3xl font-black tracking-tight text-title">Faster, Easier & Better</h2>
-          <p className="text-base leading-7 text-muted-foreground">
-            Experience the best video downloading experience with our Android apps.
+        <div className="app-feature-compact-body">
+          <p className="app-feature-eyebrow">Try Our Android Apps</p>
+          <h2 className="app-feature-title">Faster, Easier &amp; Better</h2>
+          <p className="app-feature-desc">
+            Experience the best video downloading experience with our android apps.
           </p>
+          <Button asChild variant="hero" size="lg" className="app-feature-cta">
+            <Link to="/apps">
+              Explore Apps
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Button>
         </div>
-        <Button asChild variant="hero" size="xl" className="w-fit">
-          <Link to="/apps">
-            Explore Apps
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </Button>
       </div>
 
       {apps.map((app) => {
         const Icon = app.icon;
+        const [primaryName, ...rest] = app.name.split("–").map((s) => s.trim());
+        const subtitle = rest.join(" ").trim();
         return (
-          <article key={app.slug} className="app-mini-card app-mini-card-polished">
-            <div className="app-mini-icon-wrap">
-              <div className="app-mini-icon" style={{ background: app.accent }}>
-                <Icon className="h-7 w-7 text-primary-foreground" />
-              </div>
+          <article key={app.slug} className="app-mini-card app-mini-card-compact">
+            <div className="app-mini-icon-compact" style={{ background: app.accent }}>
+              <Icon className="h-7 w-7 text-primary-foreground" />
             </div>
-            <div className="space-y-1 text-center">
-              <h3 className="app-mini-title">{app.name}</h3>
-              <RatingStars value={app.rating} />
+            <div className="app-mini-text">
+              <h3 className="app-mini-title-compact">{primaryName}</h3>
+              {subtitle ? <p className="app-mini-subtitle">{subtitle}</p> : null}
             </div>
+            <RatingStars value={app.rating} />
           </article>
         );
       })}
