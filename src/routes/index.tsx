@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowRight, CheckCircle2, Download, ShieldCheck, Smartphone, Sparkles } from "lucide-react";
+import { ArrowRight, CheckCircle2, ShieldCheck, Smartphone, Sparkles } from "lucide-react";
 
 import {
   AppShowcase,
