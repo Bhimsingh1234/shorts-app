@@ -619,14 +619,23 @@ async function triggerDownload(fileUrl: string, suggestedName: string, onProgres
   }
 }
 
+const SUPPORTED_URL_REGEX =
+  /https?:\/\/(?:www\.|m\.|mobile\.)?(youtube\.com|youtu\.be|instagram\.com|facebook\.com|fb\.watch|tiktok\.com|twitter\.com|x\.com|snapchat\.com|pinterest\.com|reddit\.com|linkedin\.com|threads\.net|vimeo\.com)\/\S+/i;
+
 export function DownloaderForm() {
   const form = useForm<z.infer<typeof downloaderSchema>>({
     resolver: zodResolver(downloaderSchema),
     defaultValues: { url: "" },
   });
   const [progress, setProgress] = useState<number | null>(null);
+  const processedRef = useRef<Set<string>>(new Set());
+  const busyRef = useRef(false);
 
-  const onSubmit = form.handleSubmit(async ({ url }) => {
+  const runDownload = async (url: string) => {
+    if (busyRef.current) return;
+    if (processedRef.current.has(url)) return;
+    processedRef.current.add(url);
+    busyRef.current = true;
     setProgress(null);
     try {
       const { getDeviceId } = await import("@/lib/device-id");
@@ -660,18 +669,58 @@ export function DownloaderForm() {
       toast.success("Download complete", { description: "Check your Downloads folder or gallery." });
       form.reset();
     } catch (err) {
-      setProgress(null);
       const message = err instanceof Error ? err.message : "Unknown error";
       if (typeof navigator !== "undefined" && !navigator.onLine) {
         toast.error("You're offline", { description: "Check your internet connection and try again." });
       } else {
         toast.error("Unable to process link", { description: message.slice(0, 140) });
       }
+    } finally {
+      setProgress(null);
+      busyRef.current = false;
     }
+  };
+
+  const onSubmit = form.handleSubmit(async ({ url }) => {
+    await runDownload(url);
   });
 
-  const busy = form.formState.isSubmitting;
+  // Auto clipboard detection: on mount and when tab regains focus
+  useEffect(() => {
+    if (typeof navigator === "undefined" || !navigator.clipboard?.readText) return;
+
+    const tryClipboard = async () => {
+      if (busyRef.current) return;
+      if (document.visibilityState !== "visible") return;
+      try {
+        const text = (await navigator.clipboard.readText()).trim();
+        if (!text) return;
+        const match = text.match(SUPPORTED_URL_REGEX);
+        if (!match) return;
+        const url = match[0];
+        if (processedRef.current.has(url)) return;
+        form.setValue("url", url, { shouldValidate: true });
+        await runDownload(url);
+      } catch {
+        // clipboard permission denied — silent
+      }
+    };
+
+    tryClipboard();
+    const onFocus = () => tryClipboard();
+    const onVisibility = () => tryClipboard();
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const busy = form.formState.isSubmitting || progress != null;
   const overlayLabel = progress != null ? `Downloading... ${progress}%` : "Fetching your video...";
+
 
   return (
     <>
