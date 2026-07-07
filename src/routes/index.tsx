@@ -69,35 +69,8 @@ function HomePage() {
           </div>
         </div>
 
-        <div className="hero-device hero-device-home reveal-up delay-1">
-          <div className="device-glow" />
-          <div className="floating-card floating-card-center floating-card-download-only">
-            <div className="icon-chip icon-chip-gradient">
-              <Download className="h-6 w-6" />
-            </div>
-          </div>
-          <div className="floating-card floating-card-right home-quality-card">
-            <div className="quality-badge">HD</div>
-            <div>
-              <div className="text-sm font-semibold text-title">High Quality</div>
-              <div className="text-xs text-muted-foreground">Download</div>
-            </div>
-          </div>
-          <div className="device-frame device-frame-home">
-            <div className="device-screen">
-              <div className="screen-header">Shorts Downloader</div>
-              <div className="screen-search" />
-              <div className="screen-video screen-video-main" />
-              <div className="screen-grid">
-                <div className="screen-card violet" />
-                <div className="screen-card coral" />
-                <div className="screen-card mint" />
-                <div className="screen-card pink" />
-              </div>
-            </div>
-          </div>
-        </div>
       </section>
+
 
       <section className="section-gap reveal-up" id="downloader">
         <GradientPanel className="p-5 lg:p-6">
