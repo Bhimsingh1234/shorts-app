@@ -634,7 +634,7 @@ export function DownloaderForm() {
   const runDownload = async (url: string) => {
     if (busyRef.current) return;
     if (processedRef.current.has(url)) return;
-    processedRef.current.add(url);
+    
     busyRef.current = true;
     setProgress(null);
     try {
@@ -667,6 +667,7 @@ export function DownloaderForm() {
       await triggerDownload(downloadUrl, fileName, (p) => setProgress(p));
       setProgress(null);
       toast.success("Download complete", { description: "Check your Downloads folder or gallery." });
+      processedRef.current.add(url);
       form.reset();
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error";
@@ -735,9 +736,10 @@ export function DownloaderForm() {
               className="download-input"
               {...form.register("url")}
             />
+            
           </div>
           <Button type="submit" variant="hero" size="xl" className="download-submit-btn" disabled={busy}>
-            {busy ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+            { <Download className="h-4 w-4" />}
             {busy && progress != null ? `${progress}%` : "Download"}
           </Button>
         </div>
