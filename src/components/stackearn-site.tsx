@@ -549,12 +549,8 @@ function HeroVisual({ variant }: { variant: HeroVariant }) {
   );
 }
 
-const DOWNLOAD_API = "https://shortsapi.stackearn.com/api/download";
+const DOWNLOAD_API = "https://shortsapi.stackearn.com/api/download-all";
 
-/**
- * Extract a downloadable URL from a flexible API response shape.
- * Supports common keys: downloadUrl, url, link, video, data.url, etc.
- */
 function pickDownloadUrl(payload: unknown): string | null {
   if (!payload || typeof payload !== "object") return null;
   const obj = payload as Record<string, unknown>;
